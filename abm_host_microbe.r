@@ -56,28 +56,33 @@ for(gen in 1:n_gens){
   To_reproduce <- W_curr[ which(ii_H)[which(ii_R)], ]
   # Maybe I can randomize the order of reproductions to ensure
   # no bias in the position
-  for(i in 1:nrow(To_reproduce)){
-    neighbors <- expand_grid(xn = (To_reproduce$x[i]-1):(To_reproduce$x[i]+1),
-                             yn = (To_reproduce$y[i]-1):(To_reproduce$y[i]+1)) %>%
-      filter(xn > 0) %>%
-      filter(yn > 0) %>%
-      filter(xn <= world_size) %>%
-      filter(yn <= world_size) %>%
-      filter(!(xn == To_reproduce$x[i] & yn == To_reproduce$y[i])) %>%
-      left_join(W_curr, by = join_by(xn == x, yn == y))
-    
-    ii_E <- neighbors$occupant == "E"
-    if(sum(ii_E) == 0){
-      next
-    }else{
-      ii_new <- sample(x = which(ii_E), size = 1)
+  if(nrow(To_reproduce > 0)){
+    for(i in 1:nrow(To_reproduce)){
+      neighbors <- expand_grid(xn = (To_reproduce$x[i]-1):(To_reproduce$x[i]+1),
+                               yn = (To_reproduce$y[i]-1):(To_reproduce$y[i]+1)) %>%
+        filter(xn > 0) %>%
+        filter(yn > 0) %>%
+        filter(xn <= world_size) %>%
+        filter(yn <= world_size) %>%
+        filter(!(xn == To_reproduce$x[i] & yn == To_reproduce$y[i])) %>%
+        left_join(W_curr, by = join_by(xn == x, yn == y))
       
-      W_curr$occupant[ W_curr$x == neighbors$xn[ii_new] & W_curr$y == neighbors$yn[ii_new] ] <- "H"
-      ii_nut <- W_curr$x == To_reproduce$x[i] & W_curr$y == To_reproduce$y[i]
-      W_curr$nut_A[ ii_nut ] <- W_curr$nut_A[ ii_nut ] - 1
-      
+      ii_E <- neighbors$occupant == "E"
+      if(sum(ii_E) == 0){
+        next
+      }else{
+        ii_new <- sample(x = which(ii_E), size = 1)
+        
+        W_curr$occupant[ W_curr$x == neighbors$xn[ii_new] & W_curr$y == neighbors$yn[ii_new] ] <- "H"
+        ii_nut <- W_curr$x == To_reproduce$x[i] & W_curr$y == To_reproduce$y[i]
+        W_curr$nut_A[ ii_nut ] <- W_curr$nut_A[ ii_nut ] - 1
+        
+      }
     }
   }
+  To_reproduce <- NULL
+  
+
   
   ii_H <- W_curr$occupant == "Hm" & (W_curr$nut_A > 0 | W_curr$nut_B > 0) 
   ii_R <- runif(n = sum(ii_H), min = 0, max = 1) < R_Hm
@@ -85,37 +90,39 @@ for(gen in 1:n_gens){
   To_reproduce <- W_curr[ which(ii_H)[which(ii_R)], ]
   # Maybe I can randomize the order of reproductions to ensure
   # no bias in the position
-  for(i in 1:nrow(To_reproduce)){
-    neighbors <- expand_grid(xn = (To_reproduce$x[i]-1):(To_reproduce$x[i]+1),
-                             yn = (To_reproduce$y[i]-1):(To_reproduce$y[i]+1)) %>%
-      filter(xn > 0) %>%
-      filter(yn > 0) %>%
-      filter(xn <= world_size) %>%
-      filter(yn <= world_size) %>%
-      filter(!(xn == To_reproduce$x[i] & yn == To_reproduce$y[i])) %>%
-      left_join(W_curr, by = join_by(xn == x, yn == y))
-    
-    ii_E <- neighbors$occupant == "E"
-    if(sum(ii_E) == 0){
-      next
-    }else{
-      ii_new <- sample(x = which(ii_E), size = 1)
+  if(nrow(To_reproduce) > 0){
+    for(i in 1:nrow(To_reproduce)){
+      neighbors <- expand_grid(xn = (To_reproduce$x[i]-1):(To_reproduce$x[i]+1),
+                               yn = (To_reproduce$y[i]-1):(To_reproduce$y[i]+1)) %>%
+        filter(xn > 0) %>%
+        filter(yn > 0) %>%
+        filter(xn <= world_size) %>%
+        filter(yn <= world_size) %>%
+        filter(!(xn == To_reproduce$x[i] & yn == To_reproduce$y[i])) %>%
+        left_join(W_curr, by = join_by(xn == x, yn == y))
       
-      W_curr$occupant[ W_curr$x == neighbors$xn[ii_new] & W_curr$y == neighbors$yn[ii_new] ] <- "Hm"
-      ii_nut <- W_curr$x == To_reproduce$x[i] & W_curr$y == To_reproduce$y[i]
-      nut_A_curr <- W_curr$nut_A[ ii_nut ]
-      nut_B_curr <- W_curr$nut_B[ ii_nut ]
-      nut_consume <- sample(c("A", "B"), size = 1, prob = c(nut_A_curr, nut_B_curr))
-      if(nut_consume == "A"){
-        W_curr$nut_A[ ii_nut ] <- nut_A_curr - 1
-      }else if(nut_consume == "B"){
-        W_curr$nut_B[ ii_nut ] <- nut_B_curr - 1
+      ii_E <- neighbors$occupant == "E"
+      if(sum(ii_E) == 0){
+        next
       }else{
-        stop("ERROR: nut_consume", call. = TRUE)
+        ii_new <- sample(x = which(ii_E), size = 1)
+        
+        W_curr$occupant[ W_curr$x == neighbors$xn[ii_new] & W_curr$y == neighbors$yn[ii_new] ] <- "Hm"
+        ii_nut <- W_curr$x == To_reproduce$x[i] & W_curr$y == To_reproduce$y[i]
+        nut_A_curr <- W_curr$nut_A[ ii_nut ]
+        nut_B_curr <- W_curr$nut_B[ ii_nut ]
+        nut_consume <- sample(c("A", "B"), size = 1, prob = c(nut_A_curr, nut_B_curr))
+        if(nut_consume == "A"){
+          W_curr$nut_A[ ii_nut ] <- nut_A_curr - 1
+        }else if(nut_consume == "B"){
+          W_curr$nut_B[ ii_nut ] <- nut_B_curr - 1
+        }else{
+          stop("ERROR: nut_consume", call. = TRUE)
+        }
       }
     }
   }
-  
+  To_reproduce <- NULL
   
   # 3. Transmit microbe
   ii_H <- W_curr$occupant == "H"
