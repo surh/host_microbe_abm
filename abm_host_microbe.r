@@ -37,7 +37,7 @@ W_0 <- expand_grid(x = 1:world_size,
 W_curr <- W_0
 Res <- W_curr %>%
   mutate(gen = 0)
-for(gen in 1:10){
+for(gen in 1:n_gens){
   cat("====== Generation ", gen, " =====\n")
   # 1. Deaths
   ii_H <- W_curr$occupant == "H"
