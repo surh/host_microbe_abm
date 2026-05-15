@@ -1,6 +1,4 @@
 library(tidyverse)
-library(deSolve)
-
 
 world_size <- 25
 nutA_0 <- 10
@@ -131,8 +129,14 @@ for(gen in 1:10){
 
 
 
-
-
+library(gganimate)
+a1 <- Res %>%
+  ggplot(aes(x = x, y = y)) +
+  geom_tile(aes(fill = occupant)) +
+  theme_classic() +
+  transition_manual(gen) +
+  labs(title = "Generation: {current_frame}")
+anim_save("sim.gif", a1, fps = 5, nframes = max(Res$gen))
 
 
 Res %>%
