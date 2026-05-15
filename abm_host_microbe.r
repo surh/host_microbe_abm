@@ -3,9 +3,9 @@ library(gganimate)
 
 
 world_size <- 25
-nutA_0 <- nutB_0 <- 10
-nutA_K <- nutB_K <- 10
-nutA_prod <- nutB_prod <- 0.1
+nutA_0 <- nutB_0 <- 3
+nutA_K <- nutB_K <- 3
+nutA_prod <- nutB_prod <- 0.01
 host_occupancy <- 0.3
 prop_microbe <- 0.1
 D_H <- D_Hm <- 0.01
