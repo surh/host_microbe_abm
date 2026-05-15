@@ -3,17 +3,18 @@ library(gganimate)
 
 
 world_size <- 25
-nutA_0 <- 10
-nutB_0 <- 10
+nutA_0 <- 3
+nutB_0 <- 3
 nutA_prod <- nutB_prod <- 0.1
-nutA_K <- nutB_K <- 10
+nutA_K <- nutB_K <- 3
 host_occupancy <- 0.3
 prop_microbe <- 0.1
 D_H <- D_Hm <- 0.01
 R_H <- R_Hm <- 0.1
 transmission_threshold <- 2
 S_M <- 0.01
-n_gens <- 1000
+n_gens <- 500
+n_gens <- 20
 
 set.seed(1291)
 W_0 <- expand_grid(x = 1:world_size,
@@ -127,7 +128,7 @@ for(gen in 1:n_gens){
   # 3. Transmit microbe
   ii_H <- W_curr$occupant == "H"
   for(i in which(ii_H)){
-    i <- which(ii_H)[1]
+    # i <- which(ii_H)[1]
     neighbors <- expand_grid(xn = (W_curr$x[i]-1):(W_curr$x[i]+1),
                              yn = (W_curr$y[i]-1):(W_curr$y[i]+1)) %>%
       filter(xn > 0) %>%
