@@ -1,4 +1,6 @@
 library(tidyverse)
+library(gganimate)
+
 
 world_size <- 25
 nutA_0 <- 10
@@ -9,6 +11,8 @@ host_occupancy <- 0.3
 prop_microbe <- 0.1
 D_H <- D_Hm <- 0.01
 R_H <- R_Hm <- 0.1
+transmission_threshold <- 2
+S_M <- 0.01
 n_gens <- 100
 
 set.seed(1291)
@@ -34,6 +38,7 @@ W_curr <- W_0
 Res <- W_curr %>%
   mutate(gen = 0)
 for(gen in 1:10){
+  cat("====== Generation ", gen, " =====\n")
   # 1. Deaths
   ii_H <- W_curr$occupant == "H"
   ii_D <- ( runif(n = sum(ii_H), min = 0, max = 1) < D_H ) | ( W_curr$nut_A[ii_H] < 1 )
@@ -44,6 +49,7 @@ for(gen in 1:10){
   W_curr$occupant[ which(ii_H)[which(ii_D)] ] <- "E"
   
   # 2. Reproduce
+  # NOTE: I should join the 2 reproduce section in just one for loop
   ii_H <- W_curr$occupant == "H" & W_curr$nut_A > 0
   ii_R <- runif(n = sum(ii_H), min = 0, max = 1) < R_H
   
@@ -72,7 +78,6 @@ for(gen in 1:10){
       
     }
   }
-  
   
   ii_H <- W_curr$occupant == "Hm" & (W_curr$nut_A > 0 | W_curr$nut_B > 0) 
   ii_R <- runif(n = sum(ii_H), min = 0, max = 1) < R_Hm
@@ -112,9 +117,31 @@ for(gen in 1:10){
   }
   
   
-  # 3. Transmit
+  # 3. Transmit microbe
+  ii_H <- W_curr$occupant == "H"
+  for(i in which(ii_H)){
+    i <- which(ii_H)[1]
+    neighbors <- expand_grid(xn = (W_curr$x[i]-1):(W_curr$x[i]+1),
+                             yn = (W_curr$y[i]-1):(W_curr$y[i]+1)) %>%
+      filter(xn > 0) %>%
+      filter(yn > 0) %>%
+      filter(xn <= world_size) %>%
+      filter(yn <= world_size) %>%
+      filter(!(xn == W_curr$x[i] & yn == W_curr$y[i])) %>%
+      left_join(W_curr, by = join_by(xn == x, yn == y))
+    
+    
+    if(sum(neighbors$occupant == "Hm") >= transmission_threshold){
+      W_curr$occupant[i] <- "Hm" 
+    }
+  }
   
-  # 4. Replenish nutrient
+  # 4. Shed microbe
+  ii_H <- W_curr$occupant == "Hm"
+  ii_S <- runif(n = sum(ii_H), min = 0, max = 1) < S_M
+  W_curr$occupant[ which(ii_H)[which(ii_S)] ] <- "H"
+  
+  # 5. Replenish nutrient
   ii_nut <- runif(n = world_size ^ 2, min = 0, max = 1) < nutA_prod & W_curr$nut_A < nutA_K
   W_curr$nut_A[ ii_nut ] <- W_curr$nut_A[ ii_nut ] + 1
   
@@ -129,7 +156,6 @@ for(gen in 1:10){
 
 
 
-library(gganimate)
 a1 <- Res %>%
   ggplot(aes(x = x, y = y)) +
   geom_tile(aes(fill = occupant)) +
