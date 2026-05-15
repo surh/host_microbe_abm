@@ -13,7 +13,7 @@ D_H <- D_Hm <- 0.01
 R_H <- R_Hm <- 0.1
 transmission_threshold <- 2
 S_M <- 0.01
-n_gens <- 100
+n_gens <- 1000
 
 set.seed(1291)
 W_0 <- expand_grid(x = 1:world_size,
