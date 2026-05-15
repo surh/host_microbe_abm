@@ -153,7 +153,7 @@ for(gen in 1:10){
                 mutate(gen = gen))
 }
 
-
+write_tsv(Res, "sim.tsv")
 
 
 a1 <- Res %>%
@@ -165,31 +165,31 @@ a1 <- Res %>%
 anim_save("sim.gif", a1, fps = 5, nframes = max(Res$gen))
 
 
-Res %>%
-  filter(gen == 0) %>%
-  ggplot(aes(x = x, y = y)) +
-  geom_tile(aes(fill = occupant)) +
-  theme_classic()
-
-Res %>%
-  filter(gen == 10) %>%
-  ggplot(aes(x = x, y = y)) +
-  geom_tile(aes(fill = occupant)) +
-  theme_classic()
-
-
-
-Res %>%
-  filter(gen == 10) %>%
-  ggplot(aes(x = x, y = y)) +
-  geom_tile(aes(fill = nut_A)) +
-  theme_classic()
-
-Res %>%
-  filter(gen == 10) %>%
-  ggplot(aes(x = x, y = y)) +
-  geom_tile(aes(fill = nut_B)) +
-  theme_classic()
+# Res %>%
+#   filter(gen == 0) %>%
+#   ggplot(aes(x = x, y = y)) +
+#   geom_tile(aes(fill = occupant)) +
+#   theme_classic()
+# 
+# Res %>%
+#   filter(gen == 10) %>%
+#   ggplot(aes(x = x, y = y)) +
+#   geom_tile(aes(fill = occupant)) +
+#   theme_classic()
+# 
+# 
+# 
+# Res %>%
+#   filter(gen == 10) %>%
+#   ggplot(aes(x = x, y = y)) +
+#   geom_tile(aes(fill = nut_A)) +
+#   theme_classic()
+# 
+# Res %>%
+#   filter(gen == 10) %>%
+#   ggplot(aes(x = x, y = y)) +
+#   geom_tile(aes(fill = nut_B)) +
+#   theme_classic()
 
 # 
 # 
